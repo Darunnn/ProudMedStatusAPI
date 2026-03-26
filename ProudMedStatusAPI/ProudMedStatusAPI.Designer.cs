@@ -2,241 +2,379 @@
 {
     partial class ProudMedStatusAPI
     {
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
+            if (disposing && (components != null)) components.Dispose();
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
             notifyIcon1 = new NotifyIcon(components);
-            panel1 = new Panel();
-            label1 = new Label();
-            Connect = new Label();
-            panel2 = new Panel();
-            label2 = new Label();
-            label3 = new Label();
-            panel3 = new Panel();
-            label4 = new Label();
-            label5 = new Label();
-            panel4 = new Panel();
-            label6 = new Label();
-            label7 = new Label();
-            panel5 = new Panel();
-            label8 = new Label();
-            label9 = new Label();
-            panel1.SuspendLayout();
-            panel2.SuspendLayout();
-            panel3.SuspendLayout();
-            panel4.SuspendLayout();
-            panel5.SuspendLayout();
+            panelDb = new Panel();
+            panelDbAccent = new Panel();
+            lblDbTitle = new Label();
+            lblDbStatus = new Label();
+            lblDbSub = new Label();
+            panelApi = new Panel();
+            panelApiAccent = new Panel();
+            lblApiTitle = new Label();
+            lblApiStatus = new Label();
+            lblApiSub = new Label();
+            panelNext = new Panel();
+            lblNextTitle = new Label();
+            lblNextValue = new Label();
+            lblNextSub = new Label();
+            panelPending = new Panel();
+            panelPendingAccent = new Panel();
+            lblPendingTitle = new Label();
+            lblPendingValue = new Label();
+            lblPendingSub = new Label();
+            panelSuccess = new Panel();
+            panelSuccessAccent = new Panel();
+            lblSuccessTitle = new Label();
+            lblSuccessValue = new Label();
+            lblSuccessSub = new Label();
+            panelFooter = new Panel();
+            lblRunning = new Label();
+            lblLastUpdate = new Label();
+            panelDb.SuspendLayout();
+            panelApi.SuspendLayout();
+            panelNext.SuspendLayout();
+            panelPending.SuspendLayout();
+            panelSuccess.SuspendLayout();
+            panelFooter.SuspendLayout();
             SuspendLayout();
             // 
             // notifyIcon1
             // 
-            notifyIcon1.Text = "notifyIcon1";
+            notifyIcon1.Text = "ProudMedStatusAPI";
             notifyIcon1.Visible = true;
             // 
-            // panel1
+            // panelDb
             // 
-            panel1.Controls.Add(label1);
-            panel1.Controls.Add(Connect);
-            panel1.Location = new Point(12, 12);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(182, 72);
-            panel1.TabIndex = 1;
+            panelDb.BackColor = Color.White;
+            panelDb.BorderStyle = BorderStyle.FixedSingle;
+            panelDb.Controls.Add(panelDbAccent);
+            panelDb.Controls.Add(lblDbTitle);
+            panelDb.Controls.Add(lblDbStatus);
+            panelDb.Controls.Add(lblDbSub);
+            panelDb.Location = new Point(10, 10);
+            panelDb.Name = "panelDb";
+            panelDb.Size = new Size(192, 68);
+            panelDb.TabIndex = 0;
             // 
-            // label1
+            // panelDbAccent
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(4, 6);
-            label1.Name = "label1";
-            label1.Size = new Size(55, 15);
-            label1.TabIndex = 2;
-            label1.Text = "Database";
+            panelDbAccent.BackColor = Color.FromArgb(34, 197, 94);
+            panelDbAccent.Location = new Point(0, 0);
+            panelDbAccent.Name = "panelDbAccent";
+            panelDbAccent.Size = new Size(3, 68);
+            panelDbAccent.TabIndex = 0;
             // 
-            // Connect
+            // lblDbTitle
             // 
-            Connect.AutoSize = true;
-            Connect.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            Connect.Location = new Point(14, 26);
-            Connect.Name = "Connect";
-            Connect.Size = new Size(0, 19);
-            Connect.TabIndex = 0;
+            lblDbTitle.AutoSize = true;
+            lblDbTitle.Font = new Font("Segoe UI", 7.5F);
+            lblDbTitle.ForeColor = Color.Gray;
+            lblDbTitle.Location = new Point(12, 8);
+            lblDbTitle.Name = "lblDbTitle";
+            lblDbTitle.Size = new Size(49, 12);
+            lblDbTitle.TabIndex = 1;
+            lblDbTitle.Text = "DATABASE";
             // 
-            // panel2
+            // lblDbStatus
             // 
-            panel2.Controls.Add(label2);
-            panel2.Controls.Add(label3);
-            panel2.Location = new Point(229, 12);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(182, 72);
-            panel2.TabIndex = 3;
+            lblDbStatus.AutoSize = true;
+            lblDbStatus.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblDbStatus.Location = new Point(12, 26);
+            lblDbStatus.Name = "lblDbStatus";
+            lblDbStatus.Size = new Size(0, 19);
+            lblDbStatus.TabIndex = 2;
             // 
-            // label2
+            // lblDbSub
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(4, 6);
-            label2.Name = "label2";
-            label2.Size = new Size(25, 15);
-            label2.TabIndex = 2;
-            label2.Text = "API";
+            lblDbSub.AutoSize = true;
+            lblDbSub.Font = new Font("Segoe UI", 7.5F);
+            lblDbSub.ForeColor = Color.Gray;
+            lblDbSub.Location = new Point(12, 48);
+            lblDbSub.Name = "lblDbSub";
+            lblDbSub.Size = new Size(0, 12);
+            lblDbSub.TabIndex = 3;
             // 
-            // label3
+            // panelApi
             // 
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            label3.Location = new Point(14, 32);
-            label3.Name = "label3";
-            label3.Size = new Size(0, 19);
-            label3.TabIndex = 0;
+            panelApi.BackColor = Color.White;
+            panelApi.BorderStyle = BorderStyle.FixedSingle;
+            panelApi.Controls.Add(panelApiAccent);
+            panelApi.Controls.Add(lblApiTitle);
+            panelApi.Controls.Add(lblApiStatus);
+            panelApi.Controls.Add(lblApiSub);
+            panelApi.Location = new Point(210, 10);
+            panelApi.Name = "panelApi";
+            panelApi.Size = new Size(192, 68);
+            panelApi.TabIndex = 1;
             // 
-            // panel3
+            // panelApiAccent
             // 
-            panel3.Controls.Add(label4);
-            panel3.Controls.Add(label5);
-            panel3.Location = new Point(12, 90);
-            panel3.Name = "panel3";
-            panel3.Size = new Size(119, 72);
-            panel3.TabIndex = 3;
+            panelApiAccent.BackColor = Color.FromArgb(59, 130, 246);
+            panelApiAccent.Location = new Point(0, 0);
+            panelApiAccent.Name = "panelApiAccent";
+            panelApiAccent.Size = new Size(3, 68);
+            panelApiAccent.TabIndex = 0;
             // 
-            // label4
+            // lblApiTitle
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(33, 7);
-            label4.Name = "label4";
-            label4.Size = new Size(49, 15);
-            label4.TabIndex = 2;
-            label4.Text = "รอบถัดไป";
+            lblApiTitle.AutoSize = true;
+            lblApiTitle.Font = new Font("Segoe UI", 7.5F);
+            lblApiTitle.ForeColor = Color.Gray;
+            lblApiTitle.Location = new Point(12, 8);
+            lblApiTitle.Name = "lblApiTitle";
+            lblApiTitle.Size = new Size(20, 12);
+            lblApiTitle.TabIndex = 1;
+            lblApiTitle.Text = "API";
             // 
-            // label5
+            // lblApiStatus
             // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            label5.Location = new Point(40, 28);
-            label5.Name = "label5";
-            label5.Size = new Size(33, 19);
-            label5.TabIndex = 0;
-            label5.Text = "eiei";
+            lblApiStatus.AutoSize = true;
+            lblApiStatus.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblApiStatus.Location = new Point(12, 26);
+            lblApiStatus.Name = "lblApiStatus";
+            lblApiStatus.Size = new Size(0, 19);
+            lblApiStatus.TabIndex = 2;
             // 
-            // panel4
+            // lblApiSub
             // 
-            panel4.Controls.Add(label6);
-            panel4.Controls.Add(label7);
-            panel4.Location = new Point(150, 90);
-            panel4.Name = "panel4";
-            panel4.Size = new Size(119, 72);
-            panel4.TabIndex = 4;
+            lblApiSub.AutoSize = true;
+            lblApiSub.Font = new Font("Segoe UI", 7.5F);
+            lblApiSub.ForeColor = Color.Gray;
+            lblApiSub.Location = new Point(12, 48);
+            lblApiSub.Name = "lblApiSub";
+            lblApiSub.Size = new Size(66, 12);
+            lblApiSub.TabIndex = 3;
+            lblApiSub.Text = "localhost:5001";
             // 
-            // label6
+            // panelNext
             // 
-            label6.AutoSize = true;
-            label6.Location = new Point(32, 6);
-            label6.Name = "label6";
-            label6.Size = new Size(62, 15);
-            label6.TabIndex = 2;
-            label6.Text = "รายการรอส่ง";
+            panelNext.BackColor = Color.White;
+            panelNext.BorderStyle = BorderStyle.FixedSingle;
+            panelNext.Controls.Add(lblNextTitle);
+            panelNext.Controls.Add(lblNextValue);
+            panelNext.Controls.Add(lblNextSub);
+            panelNext.Location = new Point(10, 86);
+            panelNext.Name = "panelNext";
+            panelNext.Size = new Size(120, 68);
+            panelNext.TabIndex = 2;
             // 
-            // label7
+            // lblNextTitle
             // 
-            label7.AutoSize = true;
-            label7.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            label7.Location = new Point(40, 28);
-            label7.Name = "label7";
-            label7.Size = new Size(33, 19);
-            label7.TabIndex = 0;
-            label7.Text = "eiei";
+            lblNextTitle.AutoSize = true;
+            lblNextTitle.Font = new Font("Segoe UI", 7.5F);
+            lblNextTitle.ForeColor = Color.Gray;
+            lblNextTitle.Location = new Point(0, 6);
+            lblNextTitle.Name = "lblNextTitle";
+            lblNextTitle.Size = new Size(41, 12);
+            lblNextTitle.TabIndex = 0;
+            lblNextTitle.Text = "รอบถัดไป";
+            lblNextTitle.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // panel5
+            // lblNextValue
             // 
-            panel5.Controls.Add(label8);
-            panel5.Controls.Add(label9);
-            panel5.Location = new Point(292, 90);
-            panel5.Name = "panel5";
-            panel5.Size = new Size(119, 72);
-            panel5.TabIndex = 5;
+            lblNextValue.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblNextValue.Location = new Point(0, 24);
+            lblNextValue.Name = "lblNextValue";
+            lblNextValue.Size = new Size(120, 28);
+            lblNextValue.TabIndex = 1;
+            lblNextValue.Text = "--:--";
+            lblNextValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // label8
+            // lblNextSub
             // 
-            label8.AutoSize = true;
-            label8.Location = new Point(32, 6);
-            label8.Name = "label8";
-            label8.Size = new Size(43, 15);
-            label8.TabIndex = 2;
-            label8.Text = "ส่งสำเร็จ";
+            lblNextSub.Font = new Font("Segoe UI", 7.5F);
+            lblNextSub.ForeColor = Color.Gray;
+            lblNextSub.Location = new Point(0, 50);
+            lblNextSub.Name = "lblNextSub";
+            lblNextSub.Size = new Size(120, 16);
+            lblNextSub.TabIndex = 2;
+            lblNextSub.Text = "นาที";
+            lblNextSub.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // label9
+            // panelPending
             // 
-            label9.AutoSize = true;
-            label9.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            label9.Location = new Point(40, 28);
-            label9.Name = "label9";
-            label9.Size = new Size(33, 19);
-            label9.TabIndex = 0;
-            label9.Text = "eiei";
+            panelPending.BackColor = Color.White;
+            panelPending.BorderStyle = BorderStyle.FixedSingle;
+            panelPending.Controls.Add(panelPendingAccent);
+            panelPending.Controls.Add(lblPendingTitle);
+            panelPending.Controls.Add(lblPendingValue);
+            panelPending.Controls.Add(lblPendingSub);
+            panelPending.Location = new Point(138, 86);
+            panelPending.Name = "panelPending";
+            panelPending.Size = new Size(120, 68);
+            panelPending.TabIndex = 3;
+            // 
+            // panelPendingAccent
+            // 
+            panelPendingAccent.BackColor = Color.FromArgb(245, 158, 11);
+            panelPendingAccent.Location = new Point(0, 0);
+            panelPendingAccent.Name = "panelPendingAccent";
+            panelPendingAccent.Size = new Size(3, 68);
+            panelPendingAccent.TabIndex = 0;
+            // 
+            // lblPendingTitle
+            // 
+            lblPendingTitle.AutoSize = true;
+            lblPendingTitle.Font = new Font("Segoe UI", 7.5F);
+            lblPendingTitle.ForeColor = Color.Gray;
+            lblPendingTitle.Location = new Point(8, 6);
+            lblPendingTitle.Name = "lblPendingTitle";
+            lblPendingTitle.Size = new Size(52, 12);
+            lblPendingTitle.TabIndex = 1;
+            lblPendingTitle.Text = "รายการรอส่ง";
+            // 
+            // lblPendingValue
+            // 
+            lblPendingValue.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblPendingValue.ForeColor = Color.FromArgb(180, 83, 9);
+            lblPendingValue.Location = new Point(8, 24);
+            lblPendingValue.Name = "lblPendingValue";
+            lblPendingValue.Size = new Size(110, 28);
+            lblPendingValue.TabIndex = 2;
+            lblPendingValue.Text = "0";
+            // 
+            // lblPendingSub
+            // 
+            lblPendingSub.Font = new Font("Segoe UI", 7.5F);
+            lblPendingSub.ForeColor = Color.Gray;
+            lblPendingSub.Location = new Point(8, 50);
+            lblPendingSub.Name = "lblPendingSub";
+            lblPendingSub.Size = new Size(110, 16);
+            lblPendingSub.TabIndex = 3;
+            lblPendingSub.Text = "รายการ";
+            // 
+            // panelSuccess
+            // 
+            panelSuccess.BackColor = Color.White;
+            panelSuccess.BorderStyle = BorderStyle.FixedSingle;
+            panelSuccess.Controls.Add(panelSuccessAccent);
+            panelSuccess.Controls.Add(lblSuccessTitle);
+            panelSuccess.Controls.Add(lblSuccessValue);
+            panelSuccess.Controls.Add(lblSuccessSub);
+            panelSuccess.Location = new Point(266, 86);
+            panelSuccess.Name = "panelSuccess";
+            panelSuccess.Size = new Size(136, 68);
+            panelSuccess.TabIndex = 4;
+            // 
+            // panelSuccessAccent
+            // 
+            panelSuccessAccent.BackColor = Color.FromArgb(139, 92, 246);
+            panelSuccessAccent.Location = new Point(0, 0);
+            panelSuccessAccent.Name = "panelSuccessAccent";
+            panelSuccessAccent.Size = new Size(3, 68);
+            panelSuccessAccent.TabIndex = 0;
+            // 
+            // lblSuccessTitle
+            // 
+            lblSuccessTitle.AutoSize = true;
+            lblSuccessTitle.Font = new Font("Segoe UI", 7.5F);
+            lblSuccessTitle.ForeColor = Color.Gray;
+            lblSuccessTitle.Location = new Point(8, 6);
+            lblSuccessTitle.Name = "lblSuccessTitle";
+            lblSuccessTitle.Size = new Size(36, 12);
+            lblSuccessTitle.TabIndex = 1;
+            lblSuccessTitle.Text = "ส่งสำเร็จ";
+            // 
+            // lblSuccessValue
+            // 
+            lblSuccessValue.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblSuccessValue.ForeColor = Color.FromArgb(109, 40, 217);
+            lblSuccessValue.Location = new Point(8, 24);
+            lblSuccessValue.Name = "lblSuccessValue";
+            lblSuccessValue.Size = new Size(126, 28);
+            lblSuccessValue.TabIndex = 2;
+            lblSuccessValue.Text = "0";
+            // 
+            // lblSuccessSub
+            // 
+            lblSuccessSub.Font = new Font("Segoe UI", 7.5F);
+            lblSuccessSub.ForeColor = Color.Gray;
+            lblSuccessSub.Location = new Point(8, 50);
+            lblSuccessSub.Name = "lblSuccessSub";
+            lblSuccessSub.Size = new Size(126, 16);
+            lblSuccessSub.TabIndex = 3;
+            lblSuccessSub.Text = "วันนี้";
+            // 
+            // panelFooter
+            // 
+            panelFooter.BackColor = Color.FromArgb(245, 245, 245);
+            panelFooter.BorderStyle = BorderStyle.FixedSingle;
+            panelFooter.Controls.Add(lblRunning);
+            panelFooter.Controls.Add(lblLastUpdate);
+            panelFooter.Location = new Point(0, 162);
+            panelFooter.Name = "panelFooter";
+            panelFooter.Size = new Size(405, 28);
+            panelFooter.TabIndex = 5;
+            // 
+            // lblRunning
+            // 
+            lblRunning.AutoSize = true;
+            lblRunning.Font = new Font("Segoe UI", 8F);
+            lblRunning.ForeColor = Color.FromArgb(34, 197, 94);
+            lblRunning.Location = new Point(10, 6);
+            lblRunning.Name = "lblRunning";
+            lblRunning.Size = new Size(65, 13);
+            lblRunning.TabIndex = 0;
+            lblRunning.Text = "● กำลังทำงาน";
+            // 
+            // lblLastUpdate
+            // 
+            lblLastUpdate.AutoSize = true;
+            lblLastUpdate.Font = new Font("Segoe UI", 8F);
+            lblLastUpdate.ForeColor = Color.Gray;
+            lblLastUpdate.Location = new Point(319, 6);
+            lblLastUpdate.Name = "lblLastUpdate";
+            lblLastUpdate.Size = new Size(0, 13);
+            lblLastUpdate.TabIndex = 1;
             // 
             // ProudMedStatusAPI
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(417, 173);
-            Controls.Add(panel5);
-            Controls.Add(panel4);
-            Controls.Add(panel3);
-            Controls.Add(panel2);
-            Controls.Add(panel1);
+            BackColor = Color.FromArgb(248, 248, 248);
+            ClientSize = new Size(417, 190);
+            Controls.Add(panelDb);
+            Controls.Add(panelApi);
+            Controls.Add(panelNext);
+            Controls.Add(panelPending);
+            Controls.Add(panelSuccess);
+            Controls.Add(panelFooter);
             Name = "ProudMedStatusAPI";
             Text = "ProudMedStatusAPI";
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
-            panel3.ResumeLayout(false);
-            panel3.PerformLayout();
-            panel4.ResumeLayout(false);
-            panel4.PerformLayout();
-            panel5.ResumeLayout(false);
-            panel5.PerformLayout();
+            panelDb.ResumeLayout(false);
+            panelDb.PerformLayout();
+            panelApi.ResumeLayout(false);
+            panelApi.PerformLayout();
+            panelNext.ResumeLayout(false);
+            panelNext.PerformLayout();
+            panelPending.ResumeLayout(false);
+            panelPending.PerformLayout();
+            panelSuccess.ResumeLayout(false);
+            panelSuccess.PerformLayout();
+            panelFooter.ResumeLayout(false);
+            panelFooter.PerformLayout();
             ResumeLayout(false);
         }
 
-        #endregion
-
         private NotifyIcon notifyIcon1;
-        private Panel panel1;
-        private Label Connect;
-        private Label label1;
-        private Panel panel2;
-        private Label label2;
-        private Label label3;
-        private Panel panel3;
-        private Label label4;
-        private Label label5;
-        private Panel panel4;
-        private Label label6;
-        private Label label7;
-        private Panel panel5;
-        private Label label8;
-        private Label label9;
+        private Panel panelDb, panelApi, panelNext, panelPending, panelSuccess, panelFooter;
+        private Panel panelDbAccent, panelApiAccent, panelPendingAccent, panelSuccessAccent;
+        private Label lblDbTitle, lblDbStatus, lblDbSub;
+        private Label lblApiTitle, lblApiStatus, lblApiSub;
+        private Label lblNextTitle, lblNextValue, lblNextSub;
+        private Label lblPendingTitle, lblPendingValue, lblPendingSub;
+        private Label lblSuccessTitle, lblSuccessValue, lblSuccessSub;
+        private Label lblRunning, lblLastUpdate;
     }
 }
