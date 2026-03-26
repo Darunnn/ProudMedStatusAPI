@@ -50,6 +50,7 @@
             // 
             // notifyIcon1
             // 
+            notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
             notifyIcon1.Text = "ProudMedStatusAPI";
             notifyIcon1.Visible = true;
             // 
