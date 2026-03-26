@@ -5,7 +5,7 @@ using System.Text;
 namespace ProudMedStatusAPI
 {
     public class LogManager
-	{
+    {
         private readonly string _logDir;
         private readonly string _errorDir;
         private readonly int _dayClearLog;
@@ -14,8 +14,8 @@ namespace ProudMedStatusAPI
         public LogManager(Config config)
         {
             string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-            _logDir    = Path.Combine(exeDir, "logs");
-            _errorDir  = Path.Combine(exeDir, "logs", "error");
+            _logDir = Path.Combine(exeDir, "logs");
+            _errorDir = Path.Combine(exeDir, "logs", "error");
             _dayClearLog = config.DayClearLog;
 
             Directory.CreateDirectory(_logDir);
@@ -24,12 +24,12 @@ namespace ProudMedStatusAPI
 
         // ---- public methods ----
 
-        public void Info(string message)  => Write(_logDir,  "INFO",  message);
-        public void Error(string message) => Write(_errorDir,"ERROR", message);
+        public void Info(string message) => Write(_logDir, "INFO", message);
+        public void Error(string message) => Write(_errorDir, "ERROR", message);
 
         public void ClearOldLogs()
         {
-            DeleteOldFiles(_logDir,   _dayClearLog);
+            DeleteOldFiles(_logDir, _dayClearLog);
             DeleteOldFiles(_errorDir, _dayClearLog);
         }
 
@@ -41,14 +41,14 @@ namespace ProudMedStatusAPI
             {
                 string fileName = DateTime.Now.ToString("yyyyMMdd") + ".log";
                 string filePath = Path.Combine(dir, fileName);
-                string line     = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{level}] {message}";
+                string line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{level}] {message}";
 
                 lock (_lock)
                 {
                     File.AppendAllText(filePath, line + Environment.NewLine, Encoding.UTF8);
                 }
             }
-            catch { }
+            catch { /* ป้องกัน infinite loop ถ้า log เขียนไม่ได้ */ }
         }
 
         private void DeleteOldFiles(string dir, int days)
