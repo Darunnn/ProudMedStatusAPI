@@ -138,7 +138,6 @@
             label5.Size = new Size(33, 19);
             label5.TabIndex = 0;
             label5.Text = "eiei";
-            
             // 
             // panel4
             // 
@@ -157,7 +156,6 @@
             label6.Size = new Size(62, 15);
             label6.TabIndex = 2;
             label6.Text = "รายการรอส่ง";
-           
             // 
             // label7
             // 
@@ -201,7 +199,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(417, 439);
+            ClientSize = new Size(417, 173);
             Controls.Add(panel5);
             Controls.Add(panel4);
             Controls.Add(panel3);
