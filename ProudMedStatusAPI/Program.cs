@@ -1,38 +1,87 @@
-﻿namespace ProudMedStatusAPI
+﻿using System;
+using System.Windows.Forms;
+
+namespace ProudMedStatusAPI
 {
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
         [STAThread]
-       
         static void Main()
         {
-            string appName = "ProudMedStatusAPI";
-            Mutex mutex;
-            bool createdNew = false;
+            const string appName = "ProudMedStatusAPI";
 
-            mutex = new Mutex(true, appName, out createdNew);
+            bool createdNew;
+            var mutex = new Mutex(true, appName, out createdNew);
 
             if (!createdNew)
             {
-                // มี instance อื่นทำงานอยู่แล้ว
-                MessageBox.Show("โปรแกรมนี้กำลังทำงานอยู่แล้ว", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    "โปรแกรมนี้กำลังทำงานอยู่แล้ว",
+                    "แจ้งเตือน",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
                 return;
             }
 
-            mutex.ReleaseMutex();
-            // ⭐ เพิ่ม: สร้าง logger ก่อน
-           
-            // ⭐ เพิ่ม: Global Exception Handlers
-          
+            // ---- Logger (ต้องสร้างก่อน Exception Handlers) ----
+            Config config;
+            LogManager log;
+            try
+            {
+                config = new Config();
+                log = new LogManager(config);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"ไม่สามารถโหลด Config.ini ได้\n{ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                mutex.ReleaseMutex();
+                return;
+            }
 
+            // ---- Global Exception Handlers ----
+            Application.ThreadException += (_, e) =>
+            {
+                log.Error($"ThreadException: {e.Exception}");
+                MessageBox.Show(
+                    $"เกิดข้อผิดพลาด:\n{e.Exception.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            };
+
+            AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            {
+                log.Error($"UnhandledException: {e.ExceptionObject}");
+            };
+
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+
+            // ---- Worker ----
+            var worker = new DispenseWorker(config, log);
+
+            // ---- Main Form ----
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ProudMedStatusAPI());
-           
-            
+
+            var form = new ProudMedStatusAPI(log);
+
+            // เชื่อม worker → UI
+            worker.OnStatsUpdated = (pending, success) =>
+                form.UpdateStats(pending, success);
+
+            worker.Start();
+            log.Info("Application started");
+
+            Application.Run(form);
+
+            // ---- Shutdown ----
+            worker.Stop();
+            log.Info("Application stopped");
+            mutex.ReleaseMutex();
         }
     }
 }

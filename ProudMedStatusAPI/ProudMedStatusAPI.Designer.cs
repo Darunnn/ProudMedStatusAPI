@@ -13,17 +13,16 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProudMedStatusAPI));
             notifyIcon1 = new NotifyIcon(components);
             panelDb = new Panel();
             panelDbAccent = new Panel();
             lblDbTitle = new Label();
             lblDbStatus = new Label();
-            lblDbSub = new Label();
             panelApi = new Panel();
             panelApiAccent = new Panel();
             lblApiTitle = new Label();
             lblApiStatus = new Label();
-            lblApiSub = new Label();
             panelNext = new Panel();
             lblNextTitle = new Label();
             lblNextValue = new Label();
@@ -61,7 +60,6 @@
             panelDb.Controls.Add(panelDbAccent);
             panelDb.Controls.Add(lblDbTitle);
             panelDb.Controls.Add(lblDbStatus);
-            panelDb.Controls.Add(lblDbSub);
             panelDb.Location = new Point(10, 10);
             panelDb.Name = "panelDb";
             panelDb.Size = new Size(192, 68);
@@ -95,16 +93,6 @@
             lblDbStatus.Size = new Size(0, 19);
             lblDbStatus.TabIndex = 2;
             // 
-            // lblDbSub
-            // 
-            lblDbSub.AutoSize = true;
-            lblDbSub.Font = new Font("Segoe UI", 7.5F);
-            lblDbSub.ForeColor = Color.Gray;
-            lblDbSub.Location = new Point(12, 48);
-            lblDbSub.Name = "lblDbSub";
-            lblDbSub.Size = new Size(0, 12);
-            lblDbSub.TabIndex = 3;
-            // 
             // panelApi
             // 
             panelApi.BackColor = Color.White;
@@ -112,7 +100,6 @@
             panelApi.Controls.Add(panelApiAccent);
             panelApi.Controls.Add(lblApiTitle);
             panelApi.Controls.Add(lblApiStatus);
-            panelApi.Controls.Add(lblApiSub);
             panelApi.Location = new Point(210, 10);
             panelApi.Name = "panelApi";
             panelApi.Size = new Size(192, 68);
@@ -145,17 +132,6 @@
             lblApiStatus.Name = "lblApiStatus";
             lblApiStatus.Size = new Size(0, 19);
             lblApiStatus.TabIndex = 2;
-            // 
-            // lblApiSub
-            // 
-            lblApiSub.AutoSize = true;
-            lblApiSub.Font = new Font("Segoe UI", 7.5F);
-            lblApiSub.ForeColor = Color.Gray;
-            lblApiSub.Location = new Point(12, 48);
-            lblApiSub.Name = "lblApiSub";
-            lblApiSub.Size = new Size(66, 12);
-            lblApiSub.TabIndex = 3;
-            lblApiSub.Text = "localhost:5001";
             // 
             // panelNext
             // 
@@ -350,6 +326,7 @@
             Controls.Add(panelPending);
             Controls.Add(panelSuccess);
             Controls.Add(panelFooter);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "ProudMedStatusAPI";
             Text = "ProudMedStatusAPI";
             panelDb.ResumeLayout(false);
@@ -370,8 +347,8 @@
         private NotifyIcon notifyIcon1;
         private Panel panelDb, panelApi, panelNext, panelPending, panelSuccess, panelFooter;
         private Panel panelDbAccent, panelApiAccent, panelPendingAccent, panelSuccessAccent;
-        private Label lblDbTitle, lblDbStatus, lblDbSub;
-        private Label lblApiTitle, lblApiStatus, lblApiSub;
+        private Label lblDbTitle, lblDbStatus;
+        private Label lblApiTitle, lblApiStatus ;
         private Label lblNextTitle, lblNextValue, lblNextSub;
         private Label lblPendingTitle, lblPendingValue, lblPendingSub;
         private Label lblSuccessTitle, lblSuccessValue, lblSuccessSub;

@@ -4,6 +4,11 @@ using System.Text;
 
 namespace ProudMedStatusAPI
 {
+    /// <summary>
+    /// เขียน log ลงโฟลเดอร์ logs/ และ logs/error/
+    /// ชื่อไฟล์ = yyyyMMdd.log
+    /// ลบไฟล์ที่เก่าเกินกว่า DayClearLog วัน
+    /// </summary>
     public class LogManager
     {
         private readonly string _logDir;
@@ -22,7 +27,7 @@ namespace ProudMedStatusAPI
             Directory.CreateDirectory(_errorDir);
         }
 
-        // ---- public methods ----
+        // ---- public ----
 
         public void Info(string message) => Write(_logDir, "INFO", message);
         public void Error(string message) => Write(_errorDir, "ERROR", message);
