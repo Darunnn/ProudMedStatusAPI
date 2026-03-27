@@ -65,7 +65,22 @@ namespace ProudMedStatusAPI
                 new SqlParameter("@id",  id),
             });
         }
+        public int CountSuccessToday()
+        {
+            const string sql = @"
+        SELECT COUNT(*) 
+        FROM TPN_T_ReceiveDispense
+        WHERE ReceiveStatus = '1'
+        AND CAST(ReceiveDateTime AS DATE) = CAST(GETDATE() AS DATE)";
 
+            var dt = _db.ExecuteQuery(sql);
+
+            // ExecuteQuery คืน DataTable → อ่าน row แรก column แรก
+            if (dt.Rows.Count > 0)
+                return Convert.ToInt32(dt.Rows[0][0]);
+
+            return 0;
+        }
         /// <summary>
         /// ลบข้อมูลเก่าที่ InsertDateTime เกินกว่า dayClear วัน
         /// </summary>

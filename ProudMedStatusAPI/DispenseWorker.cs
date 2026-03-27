@@ -20,8 +20,6 @@ namespace ProudMedStatusAPI
         // callback อัปเดต UI (pending, successToday)
         public Action<int, int>? OnStatsUpdated;
 
-        private int _successToday;
-        private DateTime _successDate = DateTime.Today;
 
         private int _isRunning = 0;
         public DispenseWorker(Config config, LogManager log)
@@ -57,36 +55,31 @@ namespace ProudMedStatusAPI
 
         private void RunOnce()
         {
-            // ถ้ารอบก่อนยังไม่เสร็จ ข้ามไปเลย
             if (Interlocked.CompareExchange(ref _isRunning, 1, 0) != 0)
             {
                 _log.Info("RunOnce skipped — รอบก่อนยังทำงานอยู่");
                 return;
             }
-
             try
             {
-                ResetSuccessCounterIfNewDay();
-
+                int successToday = _repo.CountSuccessToday(); // ประกาศครั้งแรก
                 var pending = _repo.GetPendingItems();
                 if (pending.Count == 0)
                 {
-                    NotifyUI(0, _successToday);
+                    NotifyUI(0, successToday);
                     return;
                 }
 
                 _log.Info($"พบรายการรอส่ง {pending.Count} รายการ");
-
                 string ids = string.Join(",", pending.Select(p => p.PrescriptionItemID));
                 var apiResult = _apiClient.UpdateDispenseAsync(ids).GetAwaiter().GetResult();
-
                 int successCount = ProcessResult(apiResult, pending);
-                _successToday += successCount;
 
                 ClearOldData();
                 _log.ClearOldLogs();
 
-                NotifyUI(pending.Count - successCount, _successToday);
+                successToday = _repo.CountSuccessToday(); // ✅ แค่ assign ใหม่ ไม่ต้อง int
+                NotifyUI(pending.Count - successCount, successToday);
             }
             catch (Exception ex)
             {
@@ -94,7 +87,6 @@ namespace ProudMedStatusAPI
             }
             finally
             {
-                // คืน flag ไม่ว่าจะสำเร็จหรือ error
                 Interlocked.Exchange(ref _isRunning, 0);
             }
         }
@@ -168,14 +160,7 @@ namespace ProudMedStatusAPI
             }
         }
 
-        private void ResetSuccessCounterIfNewDay()
-        {
-            if (DateTime.Today != _successDate)
-            {
-                _successToday = 0;
-                _successDate = DateTime.Today;
-            }
-        }
+        
 
         private void NotifyUI(int pending, int success) =>
             OnStatsUpdated?.Invoke(pending, success);

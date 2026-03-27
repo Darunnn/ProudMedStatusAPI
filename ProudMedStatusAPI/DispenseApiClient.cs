@@ -32,7 +32,7 @@ namespace ProudMedStatusAPI
             // ต่อ full URL ตรงๆ แทนการใช้ BaseAddress + relative path
             _fullUrl = baseUrl.TrimEnd('/') + "/api/robot/updateDispense";
 
-            _log.Info($"API URL = {_fullUrl}");
+           // _log.Info($"API URL = {_fullUrl}");
 
             _http = new HttpClient
             {
@@ -108,6 +108,20 @@ namespace ProudMedStatusAPI
             {
                 _log.Error($"Exception: {ex}");
                 return null;
+            }
+        }
+        public async Task<bool> PingAsync()
+        {
+            try
+            {
+                using var req = new HttpRequestMessage(HttpMethod.Head, _fullUrl);
+                using var res = await _http.SendAsync(req);
+                // ถ้า server ตอบกลับมา (ไม่ว่า status code อะไร) = ถือว่า reachable
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 

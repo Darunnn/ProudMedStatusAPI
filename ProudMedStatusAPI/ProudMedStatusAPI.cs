@@ -107,26 +107,43 @@ namespace ProudMedStatusAPI
             panelDbAccent.BackColor = Color.FromArgb(239, 68, 68);
         }
 
-        private void CheckApiConnection()
+        private async void CheckApiConnection()
         {
             try
             {
+                // ตรวจ URL format ก่อน
                 var uri = new Uri(_config.DomainAPI.TrimEnd('/') + "/");
-               
 
-                // แสดงสถานะเบื้องต้นว่า configured
-                lblApiStatus.Text = "Configured";
-                lblApiStatus.ForeColor = Color.FromArgb(21, 128, 61);
-                panelApiAccent.BackColor = Color.FromArgb(59, 130, 246);
+                // ping จริง
+                using var client = new DispenseApiClient(_config.DomainAPI, _logger);
+                bool reachable = await client.PingAsync();
+
+                if (reachable)
+                {
+                    lblApiStatus.Text = "Connected";
+                    lblApiStatus.ForeColor = Color.FromArgb(21, 128, 61);
+                    panelApiAccent.BackColor = Color.FromArgb(59, 130, 246);
+                }
+                else
+                {
+                    SetApiError("Unreachable");
+                }
             }
-            catch
+            catch (UriFormatException)
             {
-                lblApiStatus.Text = "Invalid URL";
-                lblApiStatus.ForeColor = Color.FromArgb(185, 28, 28);
-                panelApiAccent.BackColor = Color.FromArgb(239, 68, 68);
+                SetApiError("Invalid URL");
+            }
+            catch (Exception ex)
+            {
+                SetApiError(ex.Message.Length > 28 ? ex.Message[..28] + "…" : ex.Message);
             }
         }
-
+        private void SetApiError(string message)
+        {
+            lblApiStatus.Text = message;
+            lblApiStatus.ForeColor = Color.FromArgb(185, 28, 28);
+            panelApiAccent.BackColor = Color.FromArgb(239, 68, 68);
+        }
         // ---- Update stats (called from Worker thread) ----
 
         public void UpdateStats(int pendingCount, int successCount)
