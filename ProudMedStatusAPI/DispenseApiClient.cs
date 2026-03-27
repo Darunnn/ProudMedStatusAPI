@@ -14,6 +14,7 @@ namespace ProudMedStatusAPI
     {
         private readonly HttpClient _http;
         private readonly LogManager _log;
+        private readonly string _fullUrl;
 
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -24,14 +25,17 @@ namespace ProudMedStatusAPI
         {
             _log = log;
 
-            // รับรองทั้ง http:// และ https://
             string baseUrl = domainApi.StartsWith("http", StringComparison.OrdinalIgnoreCase)
                 ? domainApi
                 : $"http://{domainApi}";
 
+            // ต่อ full URL ตรงๆ แทนการใช้ BaseAddress + relative path
+            _fullUrl = baseUrl.TrimEnd('/') + "/api/robot/updateDispense";
+
+            _log.Info($"API URL = {_fullUrl}");
+
             _http = new HttpClient
             {
-                BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/"),
                 Timeout = TimeSpan.FromSeconds(30),
             };
         }
@@ -47,31 +51,62 @@ namespace ProudMedStatusAPI
             {
                 var body = new { PrescriptionItemID = prescriptionItemIDs };
 
-                _log.Info($"POST /api/robot/updateDispense → IDs={prescriptionItemIDs}");
-              
-                using var response = await _http.PostAsJsonAsync("api/robot/updateDispense", body);
-                string raw = await response.Content.ReadAsStringAsync();
+                // Log body ที่จะส่ง
+                string bodyJson = JsonSerializer.Serialize(body);
+                _log.Info($"POST {_fullUrl}");
+                _log.Info($"Request body: {bodyJson}");
 
+                using var request = new HttpRequestMessage(HttpMethod.Post, _fullUrl);
+                request.Content = new StringContent(bodyJson, System.Text.Encoding.UTF8, "application/json");
+
+                using var response = await _http.SendAsync(request);
+
+                string raw = await response.Content.ReadAsStringAsync();
                 int statusCode = (int)response.StatusCode;
-                _log.Info($"Response {statusCode}: {Truncate(raw, 300)}");
+
+                // Log ทุกอย่างออกมา
+                _log.Info($"StatusCode: {statusCode}");
+                _log.Info($"Raw response: [{raw}]");  // ใส่ [] เพื่อดูว่า whitespace หรือเปล่า
+                _log.Info($"Content-Type: {response.Content.Headers.ContentType}");
+                _log.Info($"Content-Length: {response.Content.Headers.ContentLength}");
 
                 if (statusCode == 201)
                 {
-                    return JsonSerializer.Deserialize<ApiResponse>(raw, _jsonOptions);
+                    if (string.IsNullOrWhiteSpace(raw))
+                    {
+                        _log.Error("201 แต่ body ว่างเปล่า!");
+                        return null;
+                    }
+
+                    try
+                    {
+                        var result = JsonSerializer.Deserialize<ApiResponse>(raw, _jsonOptions);
+                        _log.Info($"Deserialize OK: status={result?.Status}, message count={result?.Message?.Count}");
+                        return result;
+                    }
+                    catch (JsonException jex)
+                    {
+                        _log.Error($"Deserialize failed: {jex.Message}");
+                        return null;
+                    }
                 }
 
-                // 400 / 500
-                _log.Error($"API error {statusCode}: {Truncate(raw, 300)}");
+                _log.Error($"API error {statusCode}: {raw}");
                 return null;
             }
             catch (TaskCanceledException)
             {
-                _log.Error("API call timeout (>30s)");
+                _log.Error("Timeout >30s");
+                return null;
+            }
+            catch (HttpRequestException hrex)
+            {
+                _log.Error($"HttpRequest error: {hrex.Message}");  // จับ network error แยก
                 return null;
             }
             catch (Exception ex)
             {
-                _log.Error($"API call exception: {ex.Message}");
+                _log.Error($"Exception: {ex}");
                 return null;
             }
         }

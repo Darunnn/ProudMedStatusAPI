@@ -23,6 +23,7 @@ namespace ProudMedStatusAPI
         private int _successToday;
         private DateTime _successDate = DateTime.Today;
 
+        private int _isRunning = 0;
         public DispenseWorker(Config config, LogManager log)
         {
             _config = config;
@@ -56,13 +57,18 @@ namespace ProudMedStatusAPI
 
         private void RunOnce()
         {
+            // ถ้ารอบก่อนยังไม่เสร็จ ข้ามไปเลย
+            if (Interlocked.CompareExchange(ref _isRunning, 1, 0) != 0)
+            {
+                _log.Info("RunOnce skipped — รอบก่อนยังทำงานอยู่");
+                return;
+            }
+
             try
             {
                 ResetSuccessCounterIfNewDay();
 
-                // 1. ดึงรายการรอส่งจาก DB (ReceiveStatus = '0')
                 var pending = _repo.GetPendingItems();
-
                 if (pending.Count == 0)
                 {
                     NotifyUI(0, _successToday);
@@ -71,26 +77,25 @@ namespace ProudMedStatusAPI
 
                 _log.Info($"พบรายการรอส่ง {pending.Count} รายการ");
 
-                // 2. รวม PrescriptionItemID คั่น ,
                 string ids = string.Join(",", pending.Select(p => p.PrescriptionItemID));
-
-                // 3. เรียก API POST /api/robot/updateDispense
                 var apiResult = _apiClient.UpdateDispenseAsync(ids).GetAwaiter().GetResult();
 
-                // 4. Update DB ตามผล API
                 int successCount = ProcessResult(apiResult, pending);
                 _successToday += successCount;
 
-                // 5. ลบข้อมูลเก่า + clear log เก่า
                 ClearOldData();
                 _log.ClearOldLogs();
 
-                // remaining pending = total - success
                 NotifyUI(pending.Count - successCount, _successToday);
             }
             catch (Exception ex)
             {
                 _log.Error($"RunOnce Exception: {ex}");
+            }
+            finally
+            {
+                // คืน flag ไม่ว่าจะสำเร็จหรือ error
+                Interlocked.Exchange(ref _isRunning, 0);
             }
         }
 
