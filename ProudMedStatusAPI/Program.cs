@@ -10,8 +10,7 @@ namespace ProudMedStatusAPI
         {
             const string appName = "ProudMedStatusAPI";
 
-            bool createdNew;
-            var mutex = new Mutex(true, appName, out createdNew);
+            var mutex = new Mutex(true, appName, out bool createdNew);
 
             if (!createdNew)
             {
@@ -23,7 +22,7 @@ namespace ProudMedStatusAPI
                 return;
             }
 
-            // ---- Logger (ต้องสร้างก่อน Exception Handlers) ----
+            // ---- Config + Logger ----
             Config config;
             LogManager log;
             try
@@ -60,19 +59,17 @@ namespace ProudMedStatusAPI
 
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
-            // ---- Worker ----
+            // ---- Worker (สร้างที่นี่ที่เดียว ไม่ให้ Form สร้างซ้ำ) ----
             var worker = new DispenseWorker(config, log);
 
             // ---- Main Form ----
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var form = new ProudMedStatusAPI(log);
+            // ส่ง worker เข้า Form ตรงๆ
+            var form = new ProudMedStatusAPI(config, log, worker);
 
-            // เชื่อม worker → UI
-            worker.OnStatsUpdated = (pending, success) =>
-                form.UpdateStats(pending, success);
-
+            // Start หลังสร้าง Form เสร็จ เพื่อให้ UI callback พร้อมรับได้ทันที
             worker.Start();
             log.Info("Application started");
 

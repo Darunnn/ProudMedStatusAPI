@@ -6,31 +6,44 @@ namespace ProudMedStatusAPI
 {
     public partial class ProudMedStatusAPI : Form
     {
-        private System.Windows.Forms.Timer _uiTimer;
-        private Config _config;
-        private LogManager _logger;
-        private DispenseWorker _worker;
+        // ---- Constants ----
+        private const int HealthCheckIntervalSeconds = 30;
+
+        // ---- Fields ----
+        private readonly Config _config;
+        private readonly LogManager _logger;
+        private readonly DispenseWorker _worker;    // รับมาจาก Program.cs ไม่สร้างเอง
+        private readonly System.Windows.Forms.Timer _uiTimer;
+
         private DateTime _nextRoundTime;
+
+        // ติดตามสถานะล่าสุด เพื่อ log เฉพาะตอนที่สถานะเปลี่ยน
+        private bool? _lastDbReachable = null;
+        private string _lastDbError = "";
         private bool? _lastApiReachable = null;
         private string _lastApiError = "";
-        private bool? _lastDbReachable = null;  
-        private string _lastDbError = "";       
-        public ProudMedStatusAPI(LogManager log)
+
+        // ---- Constructor ----
+
+        /// <summary>
+        /// รับ config, log, worker จาก Program.cs
+        /// Form ไม่สร้าง Worker เองอีกต่อไป
+        /// </summary>
+        public ProudMedStatusAPI(Config config, LogManager log, DispenseWorker worker)
         {
             InitializeComponent();
             InitializeTray();
 
-            _config = new Config();
+            _config = config;
             _logger = log;
+            _worker = worker;
 
-            // ตรวจสอบ DB connection ครั้งแรก
+            // เชื่อม callback จาก Worker → UI
+            _worker.OnStatsUpdated = UpdateStats;
+
+            // ตรวจสอบ Connection ครั้งแรกทันที
             CheckDatabaseConnection();
             CheckApiConnection();
-
-            // เริ่ม Worker
-            _worker = new DispenseWorker(_config, _logger);
-            _worker.OnStatsUpdated = UpdateStats;
-            _worker.Start();
 
             // UI countdown timer (tick ทุก 1 วินาที)
             CalculateNextRoundTime();
@@ -42,14 +55,14 @@ namespace ProudMedStatusAPI
             _logger.Info("โปรแกรมเริ่มทำงาน");
         }
 
-        // ---- Timer UI ----
+        // ---- UI Timer ----
 
         private void OnUiTimerTick(object? sender, EventArgs e)
         {
             UpdateNextRoundCountdown();
 
-            // recheck DB + API ทุก 30 วินาที
-            if (DateTime.Now.Second % 30 == 0)
+            // Recheck DB + API ทุก HealthCheckIntervalSeconds วินาที
+            if (DateTime.Now.Second % HealthCheckIntervalSeconds == 0)
             {
                 CheckDatabaseConnection();
                 CheckApiConnection();
@@ -77,7 +90,7 @@ namespace ProudMedStatusAPI
             lblNextSub.Text = $"ทุก {_config.TimeProcess} วินาที";
         }
 
-        // ---- Status checks ----
+        // ---- Health Checks ----
 
         private void CheckDatabaseConnection()
         {
@@ -92,12 +105,14 @@ namespace ProudMedStatusAPI
             }
             catch (Exception ex)
             {
-                errorMsg = ex.Message.Length > 28 ? ex.Message[..28] + "…" : ex.Message;
+                errorMsg = ex.Message.Length > 28
+                    ? ex.Message[..28] + "…"
+                    : ex.Message;
             }
 
-            // --- Log เฉพาะตอนสถานะเปลี่ยน ---
-            bool statusChanged = (_lastDbReachable == null)
-                              || (_lastDbReachable != reachable)
+            // Log เฉพาะตอนสถานะเปลี่ยน
+            bool statusChanged = _lastDbReachable == null
+                              || _lastDbReachable != reachable
                               || (!reachable && _lastDbError != errorMsg);
 
             if (statusChanged)
@@ -111,7 +126,7 @@ namespace ProudMedStatusAPI
             _lastDbReachable = reachable;
             _lastDbError = errorMsg;
 
-            // --- อัปเดต UI ตามปกติ ---
+            // อัปเดต UI
             if (reachable)
             {
                 lblDbStatus.Text = "Connected";
@@ -120,18 +135,13 @@ namespace ProudMedStatusAPI
             }
             else
             {
-                SetDbError(errorMsg);
+                lblDbStatus.Text = "Failed";
+                lblDbStatus.ForeColor = Color.FromArgb(185, 28, 28);
+                panelDbAccent.BackColor = Color.FromArgb(239, 68, 68);
             }
 
             lblLastUpdate.Text = "อัปเดต " + DateTime.Now.ToString("HH:mm:ss");
             UpdateRunningStatus();
-        }
-
-        private void SetDbError(string message)
-        {
-            lblDbStatus.Text = "Failed";
-            lblDbStatus.ForeColor = Color.FromArgb(185, 28, 28);
-            panelDbAccent.BackColor = Color.FromArgb(239, 68, 68);
         }
 
         private async void CheckApiConnection()
@@ -141,7 +151,6 @@ namespace ProudMedStatusAPI
 
             try
             {
-                var uri = new Uri(_config.DomainAPI.TrimEnd('/') + "/");
                 using var client = new DispenseApiClient(_config.DomainAPI, _logger);
                 reachable = await client.PingAsync();
                 if (!reachable) errorMsg = "Unreachable";
@@ -152,13 +161,15 @@ namespace ProudMedStatusAPI
             }
             catch (Exception ex)
             {
-                errorMsg = ex.Message.Length > 28 ? ex.Message[..28] + "…" : ex.Message;
+                errorMsg = ex.Message.Length > 28
+                    ? ex.Message[..28] + "…"
+                    : ex.Message;
             }
 
-            // --- Log เฉพาะตอนสถานะเปลี่ยน ---
-            bool statusChanged = (_lastApiReachable == null)          // ครั้งแรก
-                              || (_lastApiReachable != reachable)      // เปลี่ยน Connected ↔ Error
-                              || (!reachable && _lastApiError != errorMsg); // error message เปลี่ยน
+            // Log เฉพาะตอนสถานะเปลี่ยน
+            bool statusChanged = _lastApiReachable == null
+                              || _lastApiReachable != reachable
+                              || (!reachable && _lastApiError != errorMsg);
 
             if (statusChanged)
             {
@@ -171,7 +182,7 @@ namespace ProudMedStatusAPI
             _lastApiReachable = reachable;
             _lastApiError = errorMsg;
 
-            // --- อัปเดต UI ตามปกติ (ทุกครั้ง ไม่ต้อง log) ---
+            // อัปเดต UI
             if (reachable)
             {
                 lblApiStatus.Text = "Connected";
@@ -180,32 +191,26 @@ namespace ProudMedStatusAPI
             }
             else
             {
-                SetApiError(errorMsg);
+                lblApiStatus.Text = errorMsg;
+                lblApiStatus.ForeColor = Color.FromArgb(185, 28, 28);
+                panelApiAccent.BackColor = Color.FromArgb(239, 68, 68);
             }
+
             UpdateRunningStatus();
         }
+
         private void UpdateRunningStatus()
         {
-            bool hasError = (_lastDbReachable == false) || (_lastApiReachable == false);
+            bool hasError = _lastDbReachable == false
+                         || _lastApiReachable == false;
 
-            if (hasError)
-            {
-                lblRunning.Text = "● ข้อผิดพลาด";
-                lblRunning.ForeColor = Color.FromArgb(185, 28, 28);
-            }
-            else
-            {
-                lblRunning.Text = "● กำลังทำงาน";
-                lblRunning.ForeColor = Color.FromArgb(34, 197, 94);
-            }
+            lblRunning.Text = hasError ? "● ข้อผิดพลาด" : "● กำลังทำงาน";
+            lblRunning.ForeColor = hasError
+                ? Color.FromArgb(185, 28, 28)
+                : Color.FromArgb(34, 197, 94);
         }
-        private void SetApiError(string message)
-        {
-            lblApiStatus.Text = message;
-            lblApiStatus.ForeColor = Color.FromArgb(185, 28, 28);
-            panelApiAccent.BackColor = Color.FromArgb(239, 68, 68);
-        }
-        // ---- Update stats (called from Worker thread) ----
+
+        // ---- Update Stats (เรียกจาก Worker thread) ----
 
         public void UpdateStats(int pendingCount, int successCount)
         {
@@ -226,6 +231,7 @@ namespace ProudMedStatusAPI
             var trayMenu = new ContextMenuStrip();
             trayMenu.Items.Add("เปิดหน้าต่าง", null, OnOpen);
             trayMenu.Items.Add("ออกจากโปรแกรม", null, OnExit);
+
             notifyIcon1.Text = "ProudMedStatusAPI";
             notifyIcon1.ContextMenuStrip = trayMenu;
             notifyIcon1.DoubleClick += OnOpen;
@@ -255,7 +261,8 @@ namespace ProudMedStatusAPI
         private void OnExit(object? sender, EventArgs e)
         {
             _uiTimer?.Stop();
-            _worker?.Stop();
+            // _worker.Stop() จะถูกเรียกที่ Program.cs หลัง Application.Run() จบ
+            // ไม่ต้องเรียกซ้ำที่นี่
             _logger?.Info("โปรแกรมปิดโดยผู้ใช้");
             notifyIcon1.Visible = false;
             Application.Exit();
@@ -263,11 +270,7 @@ namespace ProudMedStatusAPI
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-           
-                base.OnFormClosing(e);
-            
+            base.OnFormClosing(e);
         }
-
-        
     }
 }
