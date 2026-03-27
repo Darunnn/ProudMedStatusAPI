@@ -71,7 +71,12 @@ namespace ProudMedStatusAPI
                 }
 
                 _log.Info($"พบรายการรอส่ง {pending.Count} รายการ");
-                string ids = string.Join(",", pending.Select(p => p.PrescriptionItemID));
+                var distinctIds = pending
+                                 .Select(p => p.PrescriptionItemID)
+                                 .Distinct(StringComparer.OrdinalIgnoreCase)
+                                 .ToList();
+                _log.Info($"PrescriptionItemID unique ที่จะส่ง API: {distinctIds.Count} รายการ (จาก {pending.Count} รายการ)");
+                string ids = string.Join(",", distinctIds);
                 var apiResult = _apiClient.UpdateDispenseAsync(ids).GetAwaiter().GetResult();
                 int successCount = ProcessResult(apiResult, pending);
 
@@ -106,17 +111,21 @@ namespace ProudMedStatusAPI
             if (result.Message != null && result.Message.Count > 0)
             {
                 // API ตอบ 201 พร้อม detail แต่ละรายการใน message[]
-                var lookup = pending.ToDictionary(
-                    p => p.PrescriptionItemID,
-                    StringComparer.OrdinalIgnoreCase);
+                var lookup = pending
+            .GroupBy(p => p.PrescriptionItemID, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
 
                 foreach (var msg in result.Message)
                 {
-                    if (msg.status && lookup.TryGetValue(msg.prescriptionItemID, out var item))
+                    if (msg.status && lookup.TryGetValue(msg.prescriptionItemID, out var items))
                     {
-                        _repo.MarkAsSuccess(item.ID);
-                        successCount++;
-                        _log.Info($"ส่งสำเร็จ: ID={item.ID} PrescriptionItemID={msg.prescriptionItemID}");
+                        
+                        foreach (var item in items)
+                        {
+                            _repo.MarkAsSuccess(item.ID);
+                            successCount++;
+                            _log.Info($"ส่งสำเร็จ: ID={item.ID} PrescriptionItemID={msg.prescriptionItemID}");
+                        }
                     }
                     else
                     {
