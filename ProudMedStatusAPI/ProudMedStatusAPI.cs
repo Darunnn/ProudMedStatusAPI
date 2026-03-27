@@ -202,16 +202,9 @@ namespace ProudMedStatusAPI
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-
-                e.Cancel = true;
-                WindowState = FormWindowState.Minimized;
-            }
-            else
-            {
+           
                 base.OnFormClosing(e);
-            }
+            
         }
 
         
