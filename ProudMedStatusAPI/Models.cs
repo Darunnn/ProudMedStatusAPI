@@ -17,9 +17,9 @@ namespace ProudMedStatusAPI
     // ---- API Response (201) ----
     public class ApiResponseMessage
     {
-        public string PrescriptionItemID { get; set; } = "";
-        public bool Status { get; set; }
-        public string? Message { get; set; }
+        public string prescriptionItemID { get; set; } = "";
+        public bool status { get; set; }
+        public string? message { get; set; }
     }
 
     public class ApiResponse

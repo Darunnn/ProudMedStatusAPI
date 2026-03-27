@@ -115,17 +115,17 @@ namespace ProudMedStatusAPI
 
                 foreach (var msg in result.Message)
                 {
-                    if (msg.Status && lookup.TryGetValue(msg.PrescriptionItemID, out var item))
+                    if (msg.status && lookup.TryGetValue(msg.prescriptionItemID, out var item))
                     {
                         _repo.MarkAsSuccess(item.ID);
                         successCount++;
-                        _log.Info($"ส่งสำเร็จ: ID={item.ID} PrescriptionItemID={msg.PrescriptionItemID}");
+                        _log.Info($"ส่งสำเร็จ: ID={item.ID} PrescriptionItemID={msg.prescriptionItemID}");
                     }
                     else
                     {
                         _log.Error(
-                            $"API status=false: PrescriptionItemID={msg.PrescriptionItemID}" +
-                            $" message={msg.Message}");
+                            $"API status=false: PrescriptionItemID={msg.prescriptionItemID}" +
+                            $" message={msg.message}");
                     }
                 }
             }

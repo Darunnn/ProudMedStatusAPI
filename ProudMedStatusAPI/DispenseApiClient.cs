@@ -45,7 +45,7 @@ namespace ProudMedStatusAPI
         {
             try
             {
-                var body = new { prescriptionItemID = prescriptionItemIDs };
+                var body = new { PrescriptionItemID = prescriptionItemIDs };
 
                 _log.Info($"POST /api/robot/updateDispense → IDs={prescriptionItemIDs}");
               
