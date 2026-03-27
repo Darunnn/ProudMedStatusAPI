@@ -11,7 +11,10 @@ namespace ProudMedStatusAPI
         private LogManager _logger;
         private DispenseWorker _worker;
         private DateTime _nextRoundTime;
-
+        private bool? _lastApiReachable = null;
+        private string _lastApiError = "";
+        private bool? _lastDbReachable = null;  
+        private string _lastDbError = "";       
         public ProudMedStatusAPI(LogManager log)
         {
             InitializeComponent();
@@ -78,23 +81,46 @@ namespace ProudMedStatusAPI
 
         private void CheckDatabaseConnection()
         {
+            bool reachable = false;
+            string errorMsg = "";
+
             try
             {
                 var db = new Database();
-                if (db.TestConnection())
-                {
-                    lblDbStatus.Text = "Connected";
-                    lblDbStatus.ForeColor = Color.FromArgb(21, 128, 61);
-                    panelDbAccent.BackColor = Color.FromArgb(34, 197, 94);
-                }
-                else
-                {
-                    SetDbError("Failed");
-                }
+                reachable = db.TestConnection();
+                if (!reachable) errorMsg = "Failed";
             }
             catch (Exception ex)
             {
-                SetDbError(ex.Message.Length > 28 ? ex.Message[..28] + "…" : ex.Message);
+                errorMsg = ex.Message.Length > 28 ? ex.Message[..28] + "…" : ex.Message;
+            }
+
+            // --- Log เฉพาะตอนสถานะเปลี่ยน ---
+            bool statusChanged = (_lastDbReachable == null)
+                              || (_lastDbReachable != reachable)
+                              || (!reachable && _lastDbError != errorMsg);
+
+            if (statusChanged)
+            {
+                if (reachable)
+                    _logger.Info($"DB status → Connected ({_config.ConnectionStringJSD})");
+                else
+                    _logger.Error($"DB status → {errorMsg} ({_config.ConnectionStringJSD})");
+            }
+
+            _lastDbReachable = reachable;
+            _lastDbError = errorMsg;
+
+            // --- อัปเดต UI ตามปกติ ---
+            if (reachable)
+            {
+                lblDbStatus.Text = "Connected";
+                lblDbStatus.ForeColor = Color.FromArgb(21, 128, 61);
+                panelDbAccent.BackColor = Color.FromArgb(34, 197, 94);
+            }
+            else
+            {
+                SetDbError(errorMsg);
             }
 
             lblLastUpdate.Text = "อัปเดต " + DateTime.Now.ToString("HH:mm:ss");
@@ -109,33 +135,51 @@ namespace ProudMedStatusAPI
 
         private async void CheckApiConnection()
         {
+            bool reachable = false;
+            string errorMsg = "";
+
             try
             {
-                // ตรวจ URL format ก่อน
                 var uri = new Uri(_config.DomainAPI.TrimEnd('/') + "/");
-
-                // ping จริง
                 using var client = new DispenseApiClient(_config.DomainAPI, _logger);
-                bool reachable = await client.PingAsync();
-
-                if (reachable)
-                {
-                    lblApiStatus.Text = "Connected";
-                    lblApiStatus.ForeColor = Color.FromArgb(21, 128, 61);
-                    panelApiAccent.BackColor = Color.FromArgb(59, 130, 246);
-                }
-                else
-                {
-                    SetApiError("Unreachable");
-                }
+                reachable = await client.PingAsync();
+                if (!reachable) errorMsg = "Unreachable";
             }
             catch (UriFormatException)
             {
-                SetApiError("Invalid URL");
+                errorMsg = "Invalid URL";
             }
             catch (Exception ex)
             {
-                SetApiError(ex.Message.Length > 28 ? ex.Message[..28] + "…" : ex.Message);
+                errorMsg = ex.Message.Length > 28 ? ex.Message[..28] + "…" : ex.Message;
+            }
+
+            // --- Log เฉพาะตอนสถานะเปลี่ยน ---
+            bool statusChanged = (_lastApiReachable == null)          // ครั้งแรก
+                              || (_lastApiReachable != reachable)      // เปลี่ยน Connected ↔ Error
+                              || (!reachable && _lastApiError != errorMsg); // error message เปลี่ยน
+
+            if (statusChanged)
+            {
+                if (reachable)
+                    _logger.Info($"API status → Connected ({_config.DomainAPI})");
+                else
+                    _logger.Error($"API status → {errorMsg} ({_config.DomainAPI})");
+            }
+
+            _lastApiReachable = reachable;
+            _lastApiError = errorMsg;
+
+            // --- อัปเดต UI ตามปกติ (ทุกครั้ง ไม่ต้อง log) ---
+            if (reachable)
+            {
+                lblApiStatus.Text = "Connected";
+                lblApiStatus.ForeColor = Color.FromArgb(21, 128, 61);
+                panelApiAccent.BackColor = Color.FromArgb(59, 130, 246);
+            }
+            else
+            {
+                SetApiError(errorMsg);
             }
         }
         private void SetApiError(string message)
