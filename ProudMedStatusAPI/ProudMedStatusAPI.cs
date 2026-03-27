@@ -124,6 +124,7 @@ namespace ProudMedStatusAPI
             }
 
             lblLastUpdate.Text = "อัปเดต " + DateTime.Now.ToString("HH:mm:ss");
+            UpdateRunningStatus();
         }
 
         private void SetDbError(string message)
@@ -180,6 +181,22 @@ namespace ProudMedStatusAPI
             else
             {
                 SetApiError(errorMsg);
+            }
+            UpdateRunningStatus();
+        }
+        private void UpdateRunningStatus()
+        {
+            bool hasError = (_lastDbReachable == false) || (_lastApiReachable == false);
+
+            if (hasError)
+            {
+                lblRunning.Text = "● ข้อผิดพลาด";
+                lblRunning.ForeColor = Color.FromArgb(185, 28, 28);
+            }
+            else
+            {
+                lblRunning.Text = "● กำลังทำงาน";
+                lblRunning.ForeColor = Color.FromArgb(34, 197, 94);
             }
         }
         private void SetApiError(string message)
