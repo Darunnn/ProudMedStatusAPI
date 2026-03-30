@@ -100,9 +100,10 @@ namespace ProudMedStatusAPI
 
         private int ProcessResult(ApiResponse? result, List<DispenseItem> pending)
         {
+            // null = network error / timeout / API ไม่ตอบ → ไม่แตะ DB รอรอบหน้า
             if (result == null)
             {
-                _log.Error("ไม่ได้รับผลลัพธ์จาก API");
+                _log.Error("ไม่ได้รับผลลัพธ์จาก API (network error / timeout) — ข้ามรอบนี้");
                 return 0;
             }
 
@@ -110,34 +111,51 @@ namespace ProudMedStatusAPI
 
             if (result.Message != null && result.Message.Count > 0)
             {
-                // API ตอบ 201 พร้อม detail แต่ละรายการใน message[]
                 var lookup = pending
-            .GroupBy(p => p.PrescriptionItemID, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
+                    .GroupBy(p => p.PrescriptionItemID, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
+
+                var respondedIds = new HashSet<string>(
+                    result.Message.Select(m => m.prescriptionItemID),
+                    StringComparer.OrdinalIgnoreCase);
 
                 foreach (var msg in result.Message)
                 {
-                    if (msg.status && lookup.TryGetValue(msg.prescriptionItemID, out var items))
+                    if (!lookup.TryGetValue(msg.prescriptionItemID, out var items))
+                        continue;
+
+                    foreach (var item in items)
                     {
-                        
-                        foreach (var item in items)
+                        if (msg.status)
                         {
                             _repo.MarkAsSuccess(item.ID);
                             successCount++;
                             _log.Info($"ส่งสำเร็จ: ID={item.ID} PrescriptionItemID={msg.prescriptionItemID}");
                         }
+                        else
+                        {
+                            _repo.MarkAsFailed(item.ID);
+                            _log.Error(
+                                $"API ปฏิเสธ (status=3): ID={item.ID} " +
+                                $"PrescriptionItemID={msg.prescriptionItemID} " +
+                                $"message={msg.message}");
+                        }
                     }
-                    else
+                }
+
+                // จัดการรายการที่ API ไม่ตอบกลับมาเลย
+                foreach (var item in pending)
+                {
+                    if (!respondedIds.Contains(item.PrescriptionItemID))
                     {
-                        _log.Error(
-                            $"API status=false: PrescriptionItemID={msg.prescriptionItemID}" +
-                            $" message={msg.message}");
+                        _repo.MarkAsFailed(item.ID);
+                        _log.Error($"API ไม่ตอบกลับรายการนี้ (status=3): ID={item.ID} PrescriptionItemID={item.PrescriptionItemID}");
                     }
                 }
             }
             else if (string.Equals(result.Status, "OK", StringComparison.OrdinalIgnoreCase))
             {
-                // API ตอบ OK แบบ bulk ไม่มี detail → mark ทุกรายการ
+                // bulk OK ไม่มี detail → mark ทุกรายการสำเร็จ
                 foreach (var item in pending)
                 {
                     _repo.MarkAsSuccess(item.ID);
