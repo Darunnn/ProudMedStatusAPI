@@ -65,6 +65,20 @@ namespace ProudMedStatusAPI
                 new SqlParameter("@id",  id),
             });
         }
+        public void MarkAsFailed(long id)
+        {
+            const string sql = @"
+        UPDATE TPN_T_ReceiveDispense
+        SET    ReceiveStatus   = '3',
+               ReceiveDateTime = @now
+        WHERE  ID = @id";
+
+            _db.ExecuteNonQuery(sql, new[]
+            {
+        new SqlParameter("@now", DateTime.Now),
+        new SqlParameter("@id",  id),
+    });
+        }
         public int CountSuccessToday()
         {
             const string sql = @"

@@ -100,7 +100,7 @@ namespace ProudMedStatusAPI
 
         private int ProcessResult(ApiResponse? result, List<DispenseItem> pending)
         {
-            // null = network error / timeout / API ไม่ตอบ → ไม่แตะ DB รอรอบหน้า
+            
             if (result == null)
             {
                 _log.Error("ไม่ได้รับผลลัพธ์จาก API (network error / timeout) — ข้ามรอบนี้");
