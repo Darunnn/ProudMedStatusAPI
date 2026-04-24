@@ -59,7 +59,6 @@ namespace ProudMedStatusAPI
 
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
-            // ---- Worker (สร้างที่นี่ที่เดียว ไม่ให้ Form สร้างซ้ำ) ----
             var worker = new DispenseWorker(config, log);
 
             // ---- Main Form ----
